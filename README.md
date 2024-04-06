@@ -1,2 +1,2 @@
 # bookstoreapi
-Repositorio para la API de BookStore.
+Repositorio para la API de bookstore.

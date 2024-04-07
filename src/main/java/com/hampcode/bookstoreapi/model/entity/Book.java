@@ -1,4 +1,4 @@
-package com.hampcode.bookstoreapi.model;
+package com.hampcode.bookstoreapi.model.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

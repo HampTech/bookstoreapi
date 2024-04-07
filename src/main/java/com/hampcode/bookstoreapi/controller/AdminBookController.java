@@ -1,68 +1,56 @@
 package com.hampcode.bookstoreapi.controller;
 
+import com.hampcode.bookstoreapi.model.dto.BookFormDTO;
+import com.hampcode.bookstoreapi.model.entity.Book;
+import com.hampcode.bookstoreapi.service.AdminBookService;
+
+import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import com.hampcode.bookstoreapi.model.Book;
-import com.hampcode.bookstoreapi.repository.BookRepository;
-
-import lombok.AllArgsConstructor;
-
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
-@RestController
 @RequestMapping("/admin/books")
 @AllArgsConstructor
+@RestController
 public class AdminBookController {
 
-    private final BookRepository bookRepository;
-    
+    private AdminBookService adminBookService;
 
     @GetMapping
     public List<Book> list() {
-        return bookRepository.findAll();
+        return adminBookService.findAll();
     }
 
     @GetMapping("/page")
     public Page<Book> paginate(@PageableDefault(size = 5, sort = "title") Pageable pageable) {
-        return bookRepository.findAll(pageable);
+        return adminBookService.paginate(pageable);
     }
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public Book create(@RequestBody Book bookFormDTO) {
-        return bookRepository.save(bookFormDTO);
+    public Book create(@RequestBody @Validated BookFormDTO bookFormDTO) {
+        return adminBookService.create(bookFormDTO);
     }
 
     @GetMapping("/{id}")
     public Book get(@PathVariable Long id) {
-        Optional<Book> existingBook = bookRepository.findById(id);
-        return existingBook.orElseThrow(null);
+        return adminBookService.findById(id);
     }
 
     @PutMapping("/{id}")
-    public Book update(@PathVariable Long id, @RequestBody Book bookFormDTO) {
-        Optional<Book> existingBook = bookRepository.findById(id);
-        return existingBook.map(book -> {
-            book.setTitle(bookFormDTO.getTitle());
-            book.setDescription(bookFormDTO.getDescription());
-            book.setPrice(bookFormDTO.getPrice());
-            book.setSlug(bookFormDTO.getSlug());
-            book.setCoverPath(bookFormDTO.getCoverPath());
-            book.setFilePath(bookFormDTO.getFilePath());
-            book.setCreatedAt(LocalDateTime.now());
-            return bookRepository.save(book);
-        }).orElseThrow(null);
+    public Book update(@PathVariable Long id, @RequestBody @Validated BookFormDTO bookFormDTO) {
+        return adminBookService.update(id, bookFormDTO);
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
-        bookRepository.deleteById(id);
+        adminBookService.delete(id);
     }
+
 }
